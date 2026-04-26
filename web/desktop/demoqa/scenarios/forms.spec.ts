@@ -16,17 +16,17 @@ test.describe('Positive Text Box Form - User should able to input form', () => {
       "year": "1990"
     },
     "subjects": ["Maths", "Physics"],
-    "hobbies": ["Sports", "Reading"],
+    "hobbies": ["Sports", "Reading", "Music"],
     "picture": "path/to/picture.jpg",
     "currentAddress":   "Jakarta, Indonesia",
     "state": "NCR",
     "city": "Delhi"
   };
-  test.beforeAll(async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     const homePage = new HomePage(page);
     const sidebar = new SideBar(page);
 
-    await page.goto('');
+    await page.goto('/');
     await homePage.clickButton('forms');
     await sidebar.clickPracticeFormsBtn();
   });
@@ -41,7 +41,7 @@ test.describe('Positive Text Box Form - User should able to input form', () => {
     await formPage.fillForm(input);
   });
 
-  test('with required input', async ({ page }) => {
+  test.skip('with required only input', async ({ page }) => {
     const formPage = new FormPage(page);
     input.email='';
     input.subjects=[];

@@ -12,15 +12,15 @@ export class SideBar {
   }
 
   async clickDropdownFormsBtn() {
-    const dropdownFormsBtn = this.page.getByRole('button', { name: 'Forms' });
+    const dropdownFormsBtn = this.page.getByText('Forms');
     await dropdownFormsBtn.click();
   }
 
   async clickPracticeFormsBtn() {
     const practiceFormsBtn = this.page.getByRole('link', { name: 'Practice Form' });
-    if(await practiceFormsBtn.isHidden()) {
-      await this.clickDropdownFormsBtn();
-    }
+    // if(await practiceFormsBtn.isHidden()) {
+    //   await this.clickDropdownFormsBtn();
+    // }
     await practiceFormsBtn.click();
   }
 }
