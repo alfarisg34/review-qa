@@ -1,31 +1,46 @@
 import { Page, Locator } from '@playwright/test';
 
-export class LoginPage {
+export class HomePage {
   readonly page: Page;
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-  readonly errorMessage: Locator;
+  readonly elementsButton: Locator;
+  readonly formsButton: Locator;
+  readonly alertButton: Locator;
+  readonly widgetsButton: Locator;
+  readonly interactionsButton: Locator;
+  readonly bookstoreButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.usernameInput = page.locator('#user-name');
-    this.passwordInput = page.locator('#password');
-    this.loginButton = page.locator('#login-button');
-    this.errorMessage = page.locator('[data-test="error"]');
+    this.elementsButton = page.locator('a[href="/elements"]');
+    this.formsButton = page.locator('a[href="/forms"]');
+    this.alertButton = page.locator('a[href="/alertsWindows"]');
+    this.widgetsButton = page.locator('a[href="/widgets"]');
+    this.interactionsButton = page.locator('a[href="/interaction"]');
+    this.bookstoreButton = page.locator('a[href="/books"]');
   }
 
   async goto() {
-    await this.page.goto('https://www.saucedemo.com');
+    await this.page.goto('');
   }
 
-  async login(username: string, password: string) {
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-  }
+  async clickButton(buttonName: string): Promise<void> {
+    const buttonMap: Record<string, Locator> = {
+      elements: this.elementsButton,
+      forms: this.formsButton,
+      alerts: this.alertButton,
+      widgets: this.widgetsButton,
+      interactions: this.interactionsButton,
+      bookstore: this.bookstoreButton,
+    };
 
-  async getErrorMessage() {
-    return await this.errorMessage.textContent();
+    const button = buttonMap[buttonName.toLowerCase()];
+
+    if (!button) {
+      throw new Error(
+        `Button "${buttonName}" not found. Valid options: ${Object.keys(buttonMap).join(', ')}`
+      );
+    }
+
+    await button.click();
   }
 }
