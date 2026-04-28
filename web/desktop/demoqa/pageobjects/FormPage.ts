@@ -55,7 +55,7 @@ export class FormPage {
     await closeBtn.click();
   }
 
-  async fillForm(input: any) {
+  async fillForm(input: any, isPositiveCase: boolean) {
     // ── Required fields ────────────────────────────────────────────────────────
     await this.firstNameInput.fill(input.firstName);
     await this.lastNameInput.fill(input.lastName);
@@ -122,7 +122,14 @@ export class FormPage {
 
     // ── Submit & assert ────────────────────────────────────────────────────────
     await this.submitBtn.click();
-    await expect(this.modalResult).toHaveScreenshot();
-    await this.closeBtn.click();
+    if(isPositiveCase) { 
+      await expect(this.modalResult).toHaveScreenshot();
+      await this.closeBtn.click();
+    } else {
+      await expect(this.modalResult).toBeHidden();
+      await expect(this.page.locator('#userForm')).toHaveScreenshot({
+        mask: [this.dateOfBirthInput]
+      });
+    }
   }
 }
