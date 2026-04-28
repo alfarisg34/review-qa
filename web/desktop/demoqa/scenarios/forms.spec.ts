@@ -17,7 +17,7 @@ test.describe('Positive Text Box Form - User should able to input form', () => {
     },
     "subjects": ["Maths", "Physics"],
     "hobbies": ["Sports", "Reading", "Music"],
-    "picture": "path/to/picture.jpg",
+    "picture": "web\\desktop\\demoqa\\util\\pic\\test.jpg",
     "currentAddress":   "Jakarta, Indonesia",
     "state": "NCR",
     "city": "Delhi"
@@ -41,7 +41,7 @@ test.describe('Positive Text Box Form - User should able to input form', () => {
     await formPage.fillForm(input);
   });
 
-  test.skip('with required only input', async ({ page }) => {
+  test('with required only input', async ({ page }) => {
     const formPage = new FormPage(page);
     input.email='';
     input.subjects=[];

@@ -56,47 +56,72 @@ export class FormPage {
   }
 
   async fillForm(input: any) {
-    const dateOfBirth = `${input.dateOfBirth.day} ${input.dateOfBirth.month} ${input.dateOfBirth.year}`
-    const hobbyMap: Record<string, Locator> = {
-      Sports: this.sportsCheckbox,
-      Reading: this.readingCheckbox,
-      Music: this.musicCheckbox,
-    };
+    // ── Required fields ────────────────────────────────────────────────────────
     await this.firstNameInput.fill(input.firstName);
     await this.lastNameInput.fill(input.lastName);
     await this.emailInput.fill(input.email);
-    switch (input.gender) {
-      case 'Male':
-        await this.maleRadioBtn.check();
-        break;
-      case 'Female':
-        await this.femaleRadioBtn.check();
-        break;
-      case 'Other':
-        await this.otherRadioBtn.check();
-        break;
-    }
-    await this.mobileInput.fill(input.mobile);
-    await this.dateOfBirthInput.fill(dateOfBirth);
-    await this.page.keyboard.press('Escape');
-    for (const subjects of input.subjects) {
-      await this.subjectsInput.fill(subjects);
 
-      // await this.page.keyboard.press('Enter'); 
+    // ── Gender (skip if blank) ─────────────────────────────────────────────────
+    const genderMap: Record<string, Locator> = {
+      Male:   this.maleRadioBtn,
+      Female: this.femaleRadioBtn,
+      Other:  this.otherRadioBtn,
+    };
+    if (input.gender && genderMap[input.gender]) {
+      await genderMap[input.gender].check();
+    }
+
+    await this.mobileInput.fill(input.mobile ?? '');
+
+    // ── Date of birth (skip if any part is missing) ────────────────────────────
+    const { day, month, year } = input.dateOfBirth ?? {};
+    if (day && month && year) {
+      await this.dateOfBirthInput.fill(`${day} ${month} ${year}`);
+      await this.page.keyboard.press('Escape');
+    }
+
+    // ── Subjects (skip if empty array) ────────────────────────────────────────
+    for (const subject of input.subjects ?? []) {
+      await this.subjectsInput.fill(subject);
       await this.page.waitForTimeout(1000);
       await this.page.locator('#react-select-2-listbox').click();
-      // await this.page.getByRole('option', { name: `${subjects}}` }).click();
     }
-    for (const hobby of input.hobbies) {
-      await hobbyMap[hobby].setChecked(true);
+
+    // ── Hobbies (skip if empty array) ─────────────────────────────────────────
+    const hobbyMap: Record<string, Locator> = {
+      Sports:  this.sportsCheckbox,
+      Reading: this.readingCheckbox,
+      Music:   this.musicCheckbox,
+    };
+    for (const hobby of input.hobbies ?? []) {
+      if (hobbyMap[hobby]) {
+        await hobbyMap[hobby].setChecked(true);
+      }
     }
-    await this.pictureInput.setInputFiles('web/desktop/demoqa/util/pic/test.jpg');
-    await this.currentAddressInput.fill(input.currentAddress);
-    await this.stateDropdown.click();
-    await this.page.getByText(input.state).click();
-    await this.cityDropdown.click();
-    await this.page.getByText(input.city).click();
-    await this.submitBtn.click()
+
+    // ── Picture (skip if blank) ────────────────────────────────────────────────
+    if (input.picture) {
+      await this.pictureInput.setInputFiles(input.picture);
+    }
+
+    // ── Current address (skip if blank) ───────────────────────────────────────
+    if (input.currentAddress) {
+      await this.currentAddressInput.fill(input.currentAddress);
+    }
+
+    // ── State → City (city depends on state, skip both if state is blank) ─────
+    if (input.state) {
+      await this.stateDropdown.click();
+      await this.page.getByText(input.state, { exact: true }).click();
+
+      if (input.city) {
+        await this.cityDropdown.click();
+        await this.page.getByText(input.city, { exact: true }).click();
+      }
+    }
+
+    // ── Submit & assert ────────────────────────────────────────────────────────
+    await this.submitBtn.click();
     await expect(this.modalResult).toHaveScreenshot();
     await this.closeBtn.click();
   }
